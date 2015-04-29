@@ -76,6 +76,12 @@ class GearmanClient extends AbstractGearmanService
     protected $returnCode;
 
     /**
+     * @var array
+     * Array of gearman job handlers
+     */
+    protected $jobHandlers=[];
+
+    /**
      * Init tasks structure
      *
      * @return GearmanClient self Object
@@ -85,6 +91,14 @@ class GearmanClient extends AbstractGearmanService
         $this->taskStructure = array();
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJobHandlers()
+    {
+        return $this->jobHandlers;
     }
 
     /**
@@ -642,6 +656,7 @@ class GearmanClient extends AbstractGearmanService
      */
     public function runTasks()
     {
+        $this->jobHandlers=[];
         $gearmanClient = new \GearmanClient();
         $this->assignServers($gearmanClient);
 
@@ -658,7 +673,7 @@ class GearmanClient extends AbstractGearmanService
 
             if (false !== $worker) {
 
-                $gearmanClient->$type(
+                $this->jobHandlers[]=$gearmanClient->$type(
                     $worker['job']['realCallableName'],
                     $task['params'],
                     $task['context'],
